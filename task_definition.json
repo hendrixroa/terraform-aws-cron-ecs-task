@@ -1,0 +1,32 @@
+[
+  {
+    "image": "${repo_url}",
+    "name": "${app}",
+    "portMappings": [
+      {
+        "containerPort": ${listen_port},
+        "hostPort": ${listen_port}
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-region": "${region}",
+        "awslogs-group": "${app}",
+        "awslogs-stream-prefix": "louvir"
+      }
+    },
+    "secrets": [
+      {
+        "name": "${secret_name}",
+        "valueFrom": "${secret_value_arn}"
+      }
+    ],
+    "environment": [
+      {
+        "name": "APP",
+        "value": "${app}"
+      }
+    ]
+  }
+]
