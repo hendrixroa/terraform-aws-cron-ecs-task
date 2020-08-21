@@ -1,5 +1,14 @@
 [
   {
+    "essential": true,
+    "image": "906394416424.dkr.ecr.us-east-1.amazonaws.com/aws-for-fluent-bit:latest",
+    "name": "log_router",
+    "firelensConfiguration": {
+      "type": "fluentbit"
+    },
+    "memoryReservation": 50
+  },
+  {
     "image": "${repo_url}",
     "name": "${app}",
     "portMappings": [
@@ -9,11 +18,16 @@
       }
     ],
     "logConfiguration": {
-      "logDriver": "awslogs",
+      "logDriver":"awsfirelens",
       "options": {
-        "awslogs-region": "${region}",
-        "awslogs-group": "${app}",
-        "awslogs-stream-prefix": "louvir"
+        "Name": "es",
+        "Host": "${es_url}",
+        "Port": "443",
+        "Index": "${name}",
+        "Type": "${name}_type",
+        "Aws_Auth": "On",
+        "Aws_Region": "${region}",
+        "tls": "On"
       }
     },
     "secrets": [

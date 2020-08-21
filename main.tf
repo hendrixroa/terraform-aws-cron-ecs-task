@@ -25,13 +25,8 @@ data "template_file" "main" {
     region           = var.region
     secret_name      = var.secret_name
     secret_value_arn = var.secret_value_arn
+    es_url           = var.es_url
   }
-}
-
-// AWS Cloudwatch log group cron task
-resource "aws_cloudwatch_log_group" "main" {
-  name              = var.app
-  retention_in_days = 14
 }
 
 // Event target to linking the cron task and the cron job
@@ -58,24 +53,4 @@ resource "aws_cloudwatch_event_target" "main" {
   depends_on = [
     aws_ecs_task_definition.main
   ]
-}
-
-// Allow lambda permission to streaming logs of cron-task
-resource "aws_lambda_permission" "main" {
-  statement_id  = "${var.app}_cloudwatch_allow"
-  action        = "lambda:InvokeFunction"
-  function_name = var.lambda_stream_arn
-  principal     = var.cwl_endpoint
-  source_arn    = "${aws_cloudwatch_log_group.main.arn}:*"
-}
-
-// Add subscription resource to streaming logs of cron-task to Elasticsearch
-resource "aws_cloudwatch_log_subscription_filter" "main" {
-  name            = "${var.app}_cloudwatch_logs_to_elasticsearch"
-  log_group_name  = aws_cloudwatch_log_group.main.name
-  filter_pattern  = ""
-  destination_arn = var.lambda_stream_arn
-  distribution    = "Random"
-
-  depends_on = [aws_lambda_permission.main]
 }

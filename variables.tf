@@ -42,12 +42,6 @@ variable "secret_value_arn" {
   description = "ARN of secret used for ECS Task"
 }
 
-variable "cwl_endpoint" {
-  type        = string
-  default     = "logs.us-east-1.amazonaws.com"
-  description = "Cloudwatch endpoint logs"
-}
-
 variable "ecs_cluster" {
   description = "ECS Cluster where the task will be ran"
 }
@@ -76,5 +70,7 @@ variable "disable_event_rule" {
   default     = false
 }
 
-variable "lambda_stream_arn" {}
+variable "es_url" {
+  description = "Elasticsearch URL"
+}
 
