@@ -4,7 +4,9 @@
     "image": "906394416424.dkr.ecr.us-east-1.amazonaws.com/aws-for-fluent-bit:latest",
     "name": "log_router",
     "firelensConfiguration": {
-      "type": "fluentbit"
+      "type": "fluentbit",
+      "config-file-type": "file",
+      "config-file-value": "/extra.conf"
     },
     "memoryReservation": 50
   },
