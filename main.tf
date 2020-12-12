@@ -20,7 +20,7 @@ data "template_file" "main" {
 
   vars = {
     repo_url         = var.repo_url
-    app              = var.app
+    app              = lower(var.app)
     listen_port      = var.listen_port
     region           = var.region
     secret_name      = var.secret_name
