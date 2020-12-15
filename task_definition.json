@@ -44,6 +44,10 @@
       {
         "name": "APP",
         "value": "${app}"
+      },
+      {
+        "name": "NEW_RELIC_APP_NAME",
+        "value": "${app}"
       }
     ]
   }
