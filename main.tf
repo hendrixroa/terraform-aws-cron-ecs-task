@@ -8,25 +8,75 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = var.cpu_unit
   memory                   = var.memory
 
-  container_definitions = data.template_file.main.rendered
+  container_definitions = <<TASK_DEFINITION
+[
+  {
+    "essential": true,
+    "image": "906394416424.dkr.ecr.us-east-1.amazonaws.com/aws-for-fluent-bit:latest",
+    "name": "log_router",
+    "firelensConfiguration": {
+      "type": "fluentbit",
+      "options": {
+        "config-file-type": "file",
+        "config-file-value": "/fluent-bit/configs/parse-json.conf"
+      }
+    },
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${var.app}-firelens-container",
+        "awslogs-region": "${var.region}",
+        "awslogs-create-group": "true",
+        "awslogs-stream-prefix": "firelens"
+      }
+    },
+    "memoryReservation": 50
+  },
+  {
+    "essential": true,
+    "image": "${var.repo_url}",
+    "name": "${var.app}",
+    "portMappings": [
+      {
+        "containerPort": ${var.listen_port},
+        "hostPort": ${var.listen_port}
+      }
+    ],
+    "logConfiguration": {
+      "logDriver":"awsfirelens",
+      "options": {
+        "Name": "es",
+        "Host": "${var.es_url}",
+        "Port": "443",
+        "Index": "${lower(var.app)}",
+        "Type": "${lower(var.app)}_type",
+        "Aws_Auth": "On",
+        "Aws_Region": "${var.region}",
+        "tls": "On"
+      }
+    },
+    "secrets": [
+      {
+        "name": "${var.secret_name}",
+        "valueFrom": "${var.secret_value_arn}"
+      }
+    ],
+    "environment": [
+      {
+        "name": "APP",
+        "value": "${var.app}"
+      },
+      {
+        "name": "NEW_RELIC_APP_NAME",
+        "value": "${var.app}"
+      }
+    ]
+  }
+]
+TASK_DEFINITION
 
   lifecycle {
     create_before_destroy = true
-  }
-}
-
-data "template_file" "main" {
-  template = file("${path.module}/task_definition.json")
-
-  vars = {
-    repo_url         = var.repo_url
-    app              = var.app
-    name_index_log   = lower(var.app)
-    listen_port      = var.listen_port
-    region           = var.region
-    secret_name      = var.secret_name
-    secret_value_arn = var.secret_value_arn
-    es_url           = var.es_url
   }
 }
 
