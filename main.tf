@@ -92,8 +92,25 @@ TASK_DEFINITION
   }
 }
 
+data "template_file" "main" {
+  template = file("${path.module}/task_definition_${var.use_cloudwatch_logs ? "cloudwatch" : "elasticsearch"}.json")
+
+  vars = {
+    ecr_image_url    = var.repo_url
+    name             = var.app
+    name_index_log   = lower(var.app)
+    listen_port      = var.listen_port
+    region           = var.region
+    secret_name      = var.secret_name
+    secret_value_arn = var.secret_value_arn
+    prefix_logs      = var.prefix_logs
+    port             = var.listen_port
+  }
+}
+
 // Auxiliary logs
 resource "aws_cloudwatch_log_group" "main" {
+  count             = var.use_cloudwatch_logs ? 0 : 1
   name              = "${var.app}-firelens-container"
   retention_in_days = 14
 }
