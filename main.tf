@@ -1,28 +1,3 @@
-locals {
-  elasticsearch_logs_config = {
-    "logDriver" : "awsfirelens",
-    "options" : {
-      "Name" : "es",
-      "Host" : var.es_url,
-      "Port" : "443",
-      "Index" : lower(var.app),
-      "Type" : "${lower(var.app)}_type",
-      "Aws_Auth" : "On",
-      "Aws_Region" : var.region,
-      "tls" : "On"
-    }
-  }
-
-  cloudwatch_logs_config = {
-    "logDriver" : "awslogs",
-    "options" : {
-      "awslogs-region" : var.region,
-      "awslogs-group" : var.app,
-      "awslogs-stream-prefix" : var.prefix_logs
-    }
-  }
-}
-
 // AWS ECS Task defintion to run the container passed by name
 resource "aws_ecs_task_definition" "main" {
   family                   = "${var.app}-service"
@@ -33,59 +8,7 @@ resource "aws_ecs_task_definition" "main" {
   cpu                      = var.cpu_unit
   memory                   = var.memory
 
-  container_definitions = <<TASK_DEFINITION
-[
-  {
-    "essential": true,
-    "image": "906394416424.dkr.ecr.us-east-1.amazonaws.com/aws-for-fluent-bit:latest",
-    "name": "log_router",
-    "firelensConfiguration": {
-      "type": "fluentbit",
-      "options": {
-        "config-file-type": "file",
-        "config-file-value": "/fluent-bit/configs/parse-json.conf"
-      }
-    },
-    "logConfiguration": {
-      "logDriver": "awslogs",
-      "options": {
-        "awslogs-group": "${var.app}-firelens-container",
-        "awslogs-region": "${var.region}",
-        "awslogs-stream-prefix": "firelens"
-      }
-    },
-    "memoryReservation": 50
-  },
-  {
-    "essential": true,
-    "image": "${var.repo_url}",
-    "name": "${var.app}",
-    "portMappings": [
-      {
-        "containerPort": ${var.listen_port},
-        "hostPort": ${var.listen_port}
-      }
-    ],
-    "logConfiguration": ${var.use_cloudwatch_logs ? local.cloudwatch_logs_config : local.elasticsearch_logs_config},
-    "secrets": [
-      {
-        "name": "${var.secret_name}",
-        "valueFrom": "${var.secret_value_arn}"
-      }
-    ],
-    "environment": [
-      {
-        "name": "APP",
-        "value": "${var.app}"
-      },
-      {
-        "name": "NEW_RELIC_APP_NAME",
-        "value": "${var.app}"
-      }
-    ]
-  }
-]
-TASK_DEFINITION
+  container_definitions = data.template_file.main.rendered
 
   lifecycle {
     create_before_destroy = true
