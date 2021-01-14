@@ -25,7 +25,7 @@ data "template_file" "main" {
     listen_port      = var.listen_port
     region           = var.region
     secrets_name      = var.secret_name
-    secret_value_arn = var.secret_value_arn
+    secrets_value_arn = var.secret_value_arn
     prefix_logs      = var.prefix_logs
     port             = var.listen_port
   }
