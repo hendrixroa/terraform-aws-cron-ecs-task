@@ -74,3 +74,10 @@ variable "es_url" {
   description = "Elasticsearch URL"
 }
 
+variable "prefix_logs" {
+  default = "ecs"
+}
+
+variable "use_cloudwatch_logs" {
+  default = false
+}

@@ -1,3 +1,28 @@
+locals {
+  elasticsearch_logs_config = {
+    "logDriver" : "awsfirelens",
+    "options" : {
+      "Name" : "es",
+      "Host" : var.es_url,
+      "Port" : "443",
+      "Index" : lower(var.app),
+      "Type" : "${lower(var.app)}_type",
+      "Aws_Auth" : "On",
+      "Aws_Region" : var.region,
+      "tls" : "On"
+    }
+  }
+
+  cloudwatch_logs_config = {
+    "logDriver" : "awslogs",
+    "options" : {
+      "awslogs-region" : var.region,
+      "awslogs-group" : var.app,
+      "awslogs-stream-prefix" : var.prefix_logs
+    }
+  }
+}
+
 // AWS ECS Task defintion to run the container passed by name
 resource "aws_ecs_task_definition" "main" {
   family                   = "${var.app}-service"
@@ -41,19 +66,7 @@ resource "aws_ecs_task_definition" "main" {
         "hostPort": ${var.listen_port}
       }
     ],
-    "logConfiguration": {
-      "logDriver":"awsfirelens",
-      "options": {
-        "Name": "es",
-        "Host": "${var.es_url}",
-        "Port": "443",
-        "Index": "${lower(var.app)}",
-        "Type": "${lower(var.app)}_type",
-        "Aws_Auth": "On",
-        "Aws_Region": "${var.region}",
-        "tls": "On"
-      }
-    },
+    "logConfiguration": ${var.use_cloudwatch_logs ? local.cloudwatch_logs_config : local.elasticsearch_logs_config},
     "secrets": [
       {
         "name": "${var.secret_name}",
@@ -82,6 +95,12 @@ TASK_DEFINITION
 // Auxiliary logs
 resource "aws_cloudwatch_log_group" "main" {
   name              = "${var.app}-firelens-container"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "main_app" {
+  count             = var.use_cloudwatch_logs ? 1 : 0
+  name              = var.app
   retention_in_days = 14
 }
 
