@@ -28,6 +28,7 @@ data "template_file" "main" {
     secrets_value_arn = var.secret_value_arn
     prefix_logs      = var.prefix_logs
     port             = var.listen_port
+    es_url           = var.es_url
   }
 }
 
