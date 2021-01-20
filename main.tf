@@ -9,10 +9,6 @@ resource "aws_ecs_task_definition" "main" {
   memory                   = var.memory
 
   container_definitions = data.template_file.main.rendered
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 data "template_file" "main" {
