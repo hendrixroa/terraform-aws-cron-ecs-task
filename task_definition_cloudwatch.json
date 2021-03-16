@@ -17,6 +17,6 @@
         "awslogs-stream-prefix" : "${prefix_logs}"
       }
     },
-    "environment": "${environment}"
+    "environment": ${environment}
   }
 ]

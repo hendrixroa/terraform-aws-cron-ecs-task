@@ -35,6 +35,6 @@
         "tls": "On"
       }
     },
-    "environment": "${environment}"
+    "environment": ${environment}
   }
 ]
