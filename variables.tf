@@ -34,14 +34,6 @@ variable "region" {
   default     = "us-east-1"
 }
 
-variable "secret_name" {
-  description = "Secret name"
-}
-
-variable "secret_value_arn" {
-  description = "ARN of secret used for ECS Task"
-}
-
 variable "ecs_cluster" {
   description = "ECS Cluster where the task will be ran"
 }
@@ -80,4 +72,8 @@ variable "prefix_logs" {
 
 variable "use_cloudwatch_logs" {
   default = false
+}
+
+variable "environment_list" {
+  description = "Environment variables in map-list format. eg: [{ name='foo', value='bar' }]"
 }

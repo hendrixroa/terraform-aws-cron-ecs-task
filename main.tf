@@ -15,17 +15,29 @@ data "template_file" "main" {
   template = file("${path.module}/task_definition_${var.use_cloudwatch_logs ? "cloudwatch" : "elasticsearch"}.json")
 
   vars = {
-    ecr_image_url    = var.repo_url
-    name             = var.app
-    name_index_log   = lower(var.app)
-    listen_port      = var.listen_port
-    region           = var.region
-    secrets_name      = var.secret_name
-    secrets_value_arn = var.secret_value_arn
-    prefix_logs      = var.prefix_logs
-    port             = var.listen_port
-    es_url           = var.es_url
+    ecr_image_url  = var.repo_url
+    name           = var.app
+    name_index_log = lower(var.app)
+    listen_port    = var.listen_port
+    region         = var.region
+    environment    = jsonencode(concat(local.main_environment, var.environment_list))
+    prefix_logs    = var.prefix_logs
+    port           = var.listen_port
+    es_url         = var.es_url
   }
+}
+
+locals {
+  main_environment = [
+    {
+      name  = "APP",
+      value = var.app
+    },
+    {
+      name  = "NEW_RELIC_APP_NAME",
+      value = var.app
+    }
+  ]
 }
 
 // Auxiliary logs

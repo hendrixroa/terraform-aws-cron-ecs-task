@@ -35,21 +35,6 @@
         "tls": "On"
       }
     },
-    "secrets": [
-      {
-        "name": "${secrets_name}",
-        "valueFrom": "${secrets_value_arn}"
-      }
-    ],
-    "environment": [
-      {
-        "name": "APP",
-        "value": "${name}"
-      },
-      {
-        "name": "NEW_RELIC_APP_NAME",
-        "value": "${name}"
-      }
-    ]
+    "environment": "${environment}"
   }
 ]
