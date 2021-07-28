@@ -64,6 +64,7 @@ variable "disable_event_rule" {
 
 variable "es_url" {
   description = "Elasticsearch URL"
+  default = "disabled"
 }
 
 variable "prefix_logs" {
