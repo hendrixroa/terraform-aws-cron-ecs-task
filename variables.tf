@@ -23,6 +23,7 @@ variable "execution_role_arn" {
 
 variable "task_role_arn" {
   description = "IAM Role for ECS Tasks"
+  default = null
 }
 
 variable "repo_url" {
@@ -55,11 +56,6 @@ variable "security_groups" {
 variable "subnets" {
   description = "VPC Subnets"
   default     = []
-}
-
-variable "disable_event_rule" {
-  description = "Disable event rule for non-schedule scripts"
-  default     = false
 }
 
 variable "es_url" {
