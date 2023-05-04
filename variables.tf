@@ -74,3 +74,7 @@ variable "use_cloudwatch_logs" {
 variable "environment_list" {
   description = "Environment variables in map-list format. eg: [{ name='foo', value='bar' }]"
 }
+
+variable "public_ip" {
+  default = true
+}
